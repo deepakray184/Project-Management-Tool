@@ -1,4 +1,3 @@
-# Project-Management-Tool
 # SOC-Project-Management-Tool
 
 A dynamic Jira-style Kanban dashboard for SOC project execution.
