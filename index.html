@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SOC Project Kanban Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-bg"></div>
+    <main class="dashboard">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Project Management Tool</p>
+          <h1>SOC Onboarding Kanban Dashboard</h1>
+          <p class="subtitle">Jira-style board with swimlanes, assignees, priorities, and live progress tracking.</p>
+        </div>
+        <div class="topbar-actions">
+          <button id="themeToggle" class="btn secondary">🌙 Dark</button>
+          <button id="resetBoard" class="btn secondary">Reset Board</button>
+        </div>
+      </header>
+
+      <section class="summary" id="summaryCards"></section>
+
+      <section class="toolbar" aria-label="Board filters">
+        <label for="phaseFilter">Phase</label>
+        <select id="phaseFilter"></select>
+
+        <label for="priorityFilter">Priority</label>
+        <select id="priorityFilter">
+          <option value="all">All Priorities</option>
+          <option value="highest">Highest</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+
+        <label for="searchInput">Search</label>
+        <input id="searchInput" type="search" placeholder="Search task, description, assignee..." />
+
+        <button id="addTaskBtn" class="btn">+ Add Task</button>
+      </section>
+
+      <section class="board" id="kanbanBoard" aria-label="Kanban board"></section>
+    </main>
+
+    <dialog id="taskDialog">
+      <form method="dialog" id="taskForm">
+        <h2>Add New Task</h2>
+
+        <label>
+          Phase
+          <input type="text" id="phaseInput" required placeholder="e.g. 7. OPTIMIZATION" />
+        </label>
+
+        <label>
+          Task Name
+          <input type="text" id="taskInput" required placeholder="Task title" />
+        </label>
+
+        <label>
+          Description
+          <textarea id="descriptionInput" rows="3" required placeholder="Task details"></textarea>
+        </label>
+
+        <div class="form-grid">
+          <label>
+            Status
+            <select id="statusInput">
+              <option value="todo">To Do</option>
+              <option value="inprogress">In Progress</option>
+              <option value="review">Review</option>
+              <option value="done">Completed</option>
+            </select>
+          </label>
+
+          <label>
+            Priority
+            <select id="priorityInput">
+              <option value="highest">Highest</option>
+              <option value="high">High</option>
+              <option value="medium" selected>Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          Assignee
+          <select id="assigneeInput"></select>
+        </label>
+
+        <div class="actions">
+          <button type="button" class="btn secondary" id="cancelDialog">Cancel</button>
+          <button type="submit" class="btn">Save Task</button>
+        </div>
+      </form>
+    </dialog>
+
+    <template id="taskCardTemplate">
+      <article class="task-card" draggable="true">
+        <div class="task-header">
+          <h3></h3>
+          <button class="delete" title="Delete task">×</button>
+        </div>
+        <p class="phase"></p>
+        <p class="description"></p>
+        <div class="task-meta">
+          <span class="priority-chip"></span>
+          <div class="assignee" title="Assignee">
+            <span class="avatar"></span>
+            <span class="assignee-name"></span>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script src="script.js"></script>
+  </body>
+</html>
