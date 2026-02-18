@@ -20,10 +20,16 @@ A dynamic Jira-style Kanban dashboard for SOC project execution.
 - Light/Dark theme toggle with persistent preference.
 - Local storage persistence so board updates remain after refresh.
 
-## Run locally (recommended)
+## Run locally
+
+Use any of these commands (all start the same static server):
 
 ```bash
+npm run dev
+# or
 npm start
+# or
+npm run preview
 ```
 
 Then open:
@@ -41,10 +47,11 @@ python3 -m http.server 8000
 
 - Make sure you run the command **inside this repository folder** (`/workspace/Project-Management-Tool`).
 - Use exactly `http://localhost:8000` (or `http://localhost:8000/index.html`).
+- If your preview tool automatically runs `npm run dev`, this repo now supports that directly.
 - If port `8000` is busy, run with another port:
 
 ```bash
-PORT=8080 npm start
+PORT=8080 npm run dev
 ```
 
 Then open `http://localhost:8080`.
