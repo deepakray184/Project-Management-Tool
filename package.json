@@ -4,6 +4,9 @@
   "private": true,
   "description": "SOC Jira-style Kanban dashboard",
   "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "preview": "node server.js"
     "start": "node server.js"
   }
 }
