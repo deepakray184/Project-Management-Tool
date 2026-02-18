@@ -1,0 +1,258 @@
+:root {
+  --bg-1: #0f172a;
+  --bg-2: #1e293b;
+  --glass: rgba(15, 23, 42, 0.72);
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --todo: #334155;
+  --inprogress: #0f4c81;
+  --review: #7c3aed;
+  --done: #1d6f42;
+  --card: #111827;
+  --danger: #ef4444;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  font-family: Inter, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  background: radial-gradient(circle at 20% 20%, #1d4ed8 0%, transparent 40%),
+    radial-gradient(circle at 75% 0%, #2563eb 0%, transparent 35%),
+    linear-gradient(120deg, var(--bg-1), var(--bg-2));
+}
+
+.app-bg {
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(40px);
+  z-index: -1;
+}
+
+.dashboard {
+  width: min(1400px, 95vw);
+  margin: 2rem auto;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #93c5fd;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+h1 {
+  margin: 0.35rem 0;
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2.2rem);
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--muted);
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.summary-card {
+  background: var(--glass);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 12px;
+  padding: 0.8rem;
+}
+
+.summary-card h2 {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.summary-card p {
+  margin: 0.35rem 0 0;
+  font-size: 1.45rem;
+  font-weight: 700;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+select,
+input,
+textarea,
+button {
+  font: inherit;
+}
+
+select,
+input,
+textarea {
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+}
+
+.btn {
+  border: 0;
+  border-radius: 8px;
+  padding: 0.55rem 0.9rem;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn.secondary {
+  background: #334155;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(250px, 1fr));
+  gap: 0.9rem;
+}
+
+.column {
+  background: var(--glass);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 12px;
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.column-header {
+  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(8px);
+  z-index: 1;
+}
+
+.column h2 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.column small {
+  color: #cbd5e1;
+}
+
+.task-list {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.task-card {
+  background: var(--card);
+  border-left: 5px solid var(--todo);
+  border-radius: 10px;
+  padding: 0.7rem;
+}
+
+.task-card[data-status='inprogress'] { border-left-color: var(--inprogress); }
+.task-card[data-status='review'] { border-left-color: var(--review); }
+.task-card[data-status='done'] { border-left-color: var(--done); }
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.task-header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.task-card .phase {
+  margin: 0.35rem 0;
+  color: #93c5fd;
+  font-size: 0.75rem;
+}
+
+.task-card .description {
+  margin: 0;
+  color: #dbeafe;
+  font-size: 0.82rem;
+}
+
+.delete {
+  border: 0;
+  color: var(--danger);
+  background: transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+dialog {
+  width: min(450px, 90vw);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 12px;
+  background: #0f172a;
+  color: var(--text);
+}
+
+#taskForm {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.column.drop-target {
+  outline: 2px dashed #60a5fa;
+}
+
+@media (max-width: 1100px) {
+  .board {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .topbar,
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .board {
+    grid-template-columns: 1fr;
+  }
+
+  .column {
+    min-height: auto;
+  }
+}
