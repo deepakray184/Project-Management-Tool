@@ -1,0 +1,9 @@
+{
+  "name": "project-management-tool",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SOC Jira-style Kanban dashboard",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
