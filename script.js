@@ -16,6 +16,7 @@ const assignees = [
 ];
 
 const baseTasks = [
+const initialTasks = [
   ['1. SALES & PRE-SALES', 'First Customer Call', 'SOC Presentation of capabilities'],
   ['1. SALES & PRE-SALES', 'Collect Source Details', 'Share sheet to collect source details'],
   ['1. SALES & PRE-SALES', 'Estimate Size & Cost', 'Calculate SOC cost based on EPS/GB'],
@@ -46,6 +47,7 @@ const baseTasks = [
 ];
 
 const initialTasks = baseTasks.map(([phase, title, description], index) => ({
+].map(([phase, title, description], index) => ({
   id: crypto.randomUUID(),
   phase,
   title,
@@ -99,6 +101,19 @@ function loadTasks() {
   } catch {
     return initialTasks;
   }
+  status: index % 6 === 0 ? 'inprogress' : index % 9 === 0 ? 'done' : 'todo',
+}));
+
+const storageKey = 'soc-kanban-tasks';
+const board = document.getElementById('kanbanBoard');
+const phaseFilter = document.getElementById('phaseFilter');
+const summary = document.getElementById('summaryCards');
+const taskTemplate = document.getElementById('taskCardTemplate');
+const dialog = document.getElementById('taskDialog');
+
+function loadTasks() {
+  const raw = localStorage.getItem(storageKey);
+  return raw ? JSON.parse(raw) : initialTasks;
 }
 
 function saveTasks(tasks) {
@@ -113,6 +128,8 @@ function getPhases() {
 
 function populateSelectOptions() {
   const selectedPhase = phaseFilter.value || 'all';
+function populatePhaseFilter() {
+  const selected = phaseFilter.value || 'all';
   phaseFilter.innerHTML = '';
   [['all', 'All Phases'], ...getPhases().map((phase) => [phase, phase])].forEach(([value, label]) => {
     const option = document.createElement('option');
@@ -146,6 +163,11 @@ function getVisibleTasks() {
     const matchesSearch = !searchTerm || searchable.includes(searchTerm);
     return matchesPhase && matchesPriority && matchesSearch;
   });
+  phaseFilter.value = selected;
+}
+
+function getVisibleTasks() {
+  return phaseFilter.value === 'all' ? tasks : tasks.filter((task) => task.phase === phaseFilter.value);
 }
 
 function renderSummary(visibleTasks) {
@@ -160,6 +182,14 @@ function renderSummary(visibleTasks) {
 
   summary.innerHTML = cards
     .map(([title, value]) => `<article class="summary-card"><h2>${title}</h2><p>${value}</p></article>`)
+    ['Progress', `${progress}%`],
+  ];
+
+  summary.innerHTML = cards
+    .map(
+      ([title, value]) =>
+        `<article class="summary-card"><h2>${title}</h2><p>${value}</p></article>`,
+    )
     .join('');
 }
 
@@ -245,6 +275,11 @@ function renderBoard() {
   const visiblePhases = [...new Set(visibleTasks.map((task) => task.phase))];
   const phasesToRender = visiblePhases.length ? visiblePhases : getPhases();
 
+function renderBoard() {
+  populatePhaseFilter();
+  const visibleTasks = getVisibleTasks();
+  renderSummary(visibleTasks);
+
   board.innerHTML = '';
 
   statuses.forEach((status) => {
@@ -260,6 +295,13 @@ function renderBoard() {
       const laneTasks = visibleTasks.filter((task) => task.status === status.id && task.phase === phaseName);
       swimlaneList.append(createSwimlane(phaseName, status.id, laneTasks));
     });
+    column.innerHTML = `
+      <header class="column-header">
+        <h2>${status.label}</h2>
+        <small>${count} task${count === 1 ? '' : 's'}</small>
+      </header>
+      <div class="task-list"></div>
+    `;
 
     column.addEventListener('dragover', (event) => {
       event.preventDefault();
@@ -280,6 +322,11 @@ function renderBoard() {
       saveTasks(tasks);
       renderBoard();
     });
+
+    const list = column.querySelector('.task-list');
+    visibleTasks
+      .filter((task) => task.status === status.id)
+      .forEach((task) => list.append(createTaskCard(task)));
 
     board.append(column);
   });
@@ -308,6 +355,10 @@ function attachEventListeners() {
 
   document.getElementById('addTaskBtn').addEventListener('click', () => {
     populateSelectOptions();
+function attachEventListeners() {
+  phaseFilter.addEventListener('change', renderBoard);
+
+  document.getElementById('addTaskBtn').addEventListener('click', () => {
     dialog.showModal();
   });
 
@@ -340,6 +391,12 @@ function attachEventListeners() {
     saveTasks(tasks);
     event.target.reset();
     assigneeInput.value = assignees[0].id;
+
+    if (!phase || !title || !description) return;
+
+    tasks.unshift({ id: crypto.randomUUID(), phase, title, description, status });
+    saveTasks(tasks);
+    event.target.reset();
     dialog.close();
     renderBoard();
   });

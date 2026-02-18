@@ -5,6 +5,7 @@
   --bg-grad-b: #2563eb;
   --glass: rgba(15, 23, 42, 0.72);
   --surface: rgba(15, 23, 42, 0.9);
+  --glass: rgba(15, 23, 42, 0.72);
   --text: #e2e8f0;
   --muted: #94a3b8;
   --todo: #334155;
@@ -46,6 +47,8 @@ body {
   font-family: Inter, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
   background: radial-gradient(circle at 20% 20%, var(--bg-grad-a) 0%, transparent 40%),
     radial-gradient(circle at 75% 0%, var(--bg-grad-b) 0%, transparent 35%),
+  background: radial-gradient(circle at 20% 20%, #1d4ed8 0%, transparent 40%),
+    radial-gradient(circle at 75% 0%, #2563eb 0%, transparent 35%),
     linear-gradient(120deg, var(--bg-1), var(--bg-2));
 }
 
@@ -59,6 +62,8 @@ body {
 .dashboard {
   width: min(1500px, 95vw);
   margin: 1.4rem auto;
+  width: min(1400px, 95vw);
+  margin: 2rem auto;
 }
 
 .topbar {
@@ -72,6 +77,7 @@ body {
 .topbar-actions {
   display: flex;
   gap: 0.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .eyebrow {
@@ -101,6 +107,9 @@ h1 {
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 0.6rem;
   margin-bottom: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .summary-card {
@@ -108,17 +117,22 @@ h1 {
   border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 12px;
   padding: 0.75rem;
+  padding: 0.8rem;
 }
 
 .summary-card h2 {
   margin: 0;
   font-size: 0.78rem;
   color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #cbd5e1;
 }
 
 .summary-card p {
   margin: 0.35rem 0 0;
   font-size: 1.3rem;
+  font-size: 1.45rem;
   font-weight: 700;
 }
 
@@ -127,6 +141,9 @@ h1 {
   grid-template-columns: auto minmax(180px, 1fr) auto minmax(140px, 1fr) auto minmax(260px, 2fr) auto;
   align-items: center;
   gap: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
   margin-bottom: 1rem;
 }
 
@@ -145,6 +162,11 @@ textarea {
   border: 1px solid rgba(148, 163, 184, 0.35);
   border-radius: 8px;
   padding: 0.48rem 0.65rem;
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
 }
 
 .btn {
@@ -171,6 +193,10 @@ body[data-theme='light'] .btn.secondary {
   grid-template-columns: repeat(4, minmax(280px, 1fr));
   gap: 0.8rem;
   align-items: start;
+.board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(250px, 1fr));
+  gap: 0.9rem;
 }
 
 .column {
@@ -178,17 +204,20 @@ body[data-theme='light'] .btn.secondary {
   border: 1px solid rgba(148, 163, 184, 0.25);
   border-radius: 12px;
   min-height: 75vh;
+  min-height: 70vh;
   display: flex;
   flex-direction: column;
 }
 
 .column-header {
   padding: 0.75rem 0.85rem;
+  padding: 0.7rem 0.85rem;
   border-bottom: 1px solid rgba(148, 163, 184, 0.2);
   position: sticky;
   top: 0;
   backdrop-filter: blur(8px);
   z-index: 2;
+  z-index: 1;
 }
 
 .column h2 {
@@ -231,6 +260,18 @@ body[data-theme='light'] .swimlane-title {
   flex-direction: column;
   gap: 0.55rem;
   min-height: 42px;
+  font-size: 0.95rem;
+}
+
+.column small {
+  color: #cbd5e1;
+}
+
+.task-list {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
 }
 
 .task-card {
@@ -252,6 +293,12 @@ body[data-theme='light'] .swimlane-title {
 .task-card[data-status='done'] {
   border-left-color: var(--done);
 }
+  padding: 0.7rem;
+}
+
+.task-card[data-status='inprogress'] { border-left-color: var(--inprogress); }
+.task-card[data-status='review'] { border-left-color: var(--review); }
+.task-card[data-status='done'] { border-left-color: var(--done); }
 
 .task-header {
   display: flex;
@@ -273,6 +320,13 @@ body[data-theme='light'] .swimlane-title {
 
 body[data-theme='light'] .task-card .phase {
   color: #1e3a8a;
+  font-size: 0.95rem;
+}
+
+.task-card .phase {
+  margin: 0.35rem 0;
+  color: #93c5fd;
+  font-size: 0.75rem;
 }
 
 .task-card .description {
@@ -331,6 +385,8 @@ body[data-theme='light'] .task-card .phase {
   color: white;
   font-size: 0.62rem;
   font-weight: 700;
+  color: #dbeafe;
+  font-size: 0.82rem;
 }
 
 .delete {
@@ -347,6 +403,10 @@ dialog {
   border: 1px solid rgba(148, 163, 184, 0.25);
   border-radius: 12px;
   background: var(--surface);
+  width: min(450px, 90vw);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 12px;
+  background: #0f172a;
   color: var(--text);
 }
 
@@ -397,6 +457,19 @@ dialog {
 @media (max-width: 760px) {
   .topbar,
   .topbar-actions {
+.column.drop-target {
+  outline: 2px dashed #60a5fa;
+}
+
+@media (max-width: 1100px) {
+  .board {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .topbar,
+  .toolbar {
     flex-direction: column;
     align-items: stretch;
   }
@@ -404,6 +477,7 @@ dialog {
   .board,
   .form-grid,
   .toolbar {
+  .board {
     grid-template-columns: 1fr;
   }
 
