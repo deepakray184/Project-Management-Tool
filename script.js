@@ -276,6 +276,7 @@ function attachEventListeners() {
 
     tasks.unshift(
       normalizeTask({ id: crypto.randomUUID(), phase, title, description, status: 'todo', priority, assigneeId }),
+      normalizeTask({ id: crypto.randomUUID(), phase, title, description, status, priority, assigneeId }),
     );
 
     saveTasks(tasks);
