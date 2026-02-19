@@ -7,32 +7,28 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="app-bg"></div>
     <main class="dashboard">
       <header class="topbar">
         <div>
-          <p class="eyebrow">Project Management Tool</p>
-          <h1>SOC Onboarding Kanban Dashboard</h1>
-          <p class="subtitle">Jira-style board with swimlanes, assignees, priorities, and live progress tracking.</p>
+          <p class="eyebrow">Projects / SOC Delivery</p>
+          <h1>Board</h1>
+          <p class="subtitle">Dynamic Jira-style Kanban dashboard with persistent task storage.</p>
         </div>
         <div class="topbar-actions">
-          <button id="themeToggle" class="btn secondary">🌙 Dark</button>
-          <button id="resetBoard" class="btn secondary">Reset Board</button>
+          <button id="themeToggle" class="btn secondary" type="button">🌙 Dark</button>
+          <button id="resetBoard" class="btn secondary" type="button">Reset</button>
         </div>
-          <p class="subtitle">Jira-style board for tracking onboarding, integration, and go-live tasks.</p>
-        </div>
-        <button id="resetBoard" class="btn secondary">Reset Board</button>
       </header>
 
-      <section class="summary" id="summaryCards"></section>
+      <section class="summary" id="summaryCards" aria-label="Summary"></section>
 
-      <section class="toolbar" aria-label="Board filters">
+      <section class="toolbar" aria-label="Board controls">
         <label for="phaseFilter">Phase</label>
         <select id="phaseFilter"></select>
 
         <label for="priorityFilter">Priority</label>
         <select id="priorityFilter">
-          <option value="all">All Priorities</option>
+          <option value="all">All priorities</option>
           <option value="highest">Highest</option>
           <option value="high">High</option>
           <option value="medium">Medium</option>
@@ -40,12 +36,9 @@
         </select>
 
         <label for="searchInput">Search</label>
-        <input id="searchInput" type="search" placeholder="Search task, description, assignee..." />
+        <input id="searchInput" type="search" placeholder="Search tasks, phases, descriptions, assignees" />
 
-      <section class="toolbar">
-        <label for="phaseFilter">Filter by Phase</label>
-        <select id="phaseFilter"></select>
-        <button id="addTaskBtn" class="btn">+ Add Task</button>
+        <button id="addTaskBtn" class="btn" type="button">+ Add Task</button>
       </section>
 
       <section class="board" id="kanbanBoard" aria-label="Kanban board"></section>
@@ -57,7 +50,7 @@
 
         <label>
           Phase
-          <input type="text" id="phaseInput" required placeholder="e.g. 7. OPTIMIZATION" />
+          <input type="text" id="phaseInput" required placeholder="e.g. 3. INTEGRATION" />
         </label>
 
         <label>
@@ -70,42 +63,23 @@
           <textarea id="descriptionInput" rows="3" required placeholder="Task details"></textarea>
         </label>
 
-        <div class="form-grid">
-          <label>
-            Status
-            <select id="statusInput">
-              <option value="todo">To Do</option>
-              <option value="inprogress">In Progress</option>
-              <option value="review">Review</option>
-              <option value="done">Completed</option>
-            </select>
-          </label>
+        <p class="form-note">New tasks are always created in <strong>To Do</strong>.</p>
 
-          <label>
-            Priority
-            <select id="priorityInput">
-              <option value="highest">Highest</option>
-              <option value="high">High</option>
-              <option value="medium" selected>Medium</option>
-              <option value="low">Low</option>
-            </select>
-          </label>
-        </div>
+        <label>
+          Priority
+          <select id="priorityInput">
+            <option value="highest">Highest</option>
+            <option value="high">High</option>
+            <option value="medium" selected>Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </label>
 
         <label>
           Assignee
           <select id="assigneeInput"></select>
         </label>
 
-        <label>
-          Status
-          <select id="statusInput">
-            <option value="todo">To Do</option>
-            <option value="inprogress">In Progress</option>
-            <option value="review">Review</option>
-            <option value="done">Completed</option>
-          </select>
-        </label>
         <div class="actions">
           <button type="button" class="btn secondary" id="cancelDialog">Cancel</button>
           <button type="submit" class="btn">Save Task</button>
@@ -117,7 +91,7 @@
       <article class="task-card" draggable="true">
         <div class="task-header">
           <h3></h3>
-          <button class="delete" title="Delete task">×</button>
+          <button class="delete" title="Delete task" type="button">×</button>
         </div>
         <p class="phase"></p>
         <p class="description"></p>

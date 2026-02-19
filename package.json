@@ -7,6 +7,5 @@
     "dev": "node server.js",
     "start": "node server.js",
     "preview": "node server.js"
-    "start": "node server.js"
   }
 }
