@@ -63,6 +63,7 @@
           <textarea id="descriptionInput" rows="3" required placeholder="Task details"></textarea>
         </label>
 
+        <p class="form-note">New tasks are always created in <strong>To Do</strong>.</p>
         <div class="form-grid">
           <label>
             Status
@@ -84,6 +85,16 @@
             </select>
           </label>
         </div>
+
+        <label>
+          Priority
+          <select id="priorityInput">
+            <option value="highest">Highest</option>
+            <option value="high">High</option>
+            <option value="medium" selected>Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </label>
 
         <label>
           Assignee

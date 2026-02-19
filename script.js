@@ -269,19 +269,22 @@ function attachEventListeners() {
     const phase = document.getElementById('phaseInput').value.trim();
     const title = document.getElementById('taskInput').value.trim();
     const description = document.getElementById('descriptionInput').value.trim();
-    const status = document.getElementById('statusInput').value;
     const priority = document.getElementById('priorityInput').value;
     const assigneeId = assigneeInput.value;
 
     if (!phase || !title || !description) return;
 
     tasks.unshift(
+      normalizeTask({ id: crypto.randomUUID(), phase, title, description, status: 'todo', priority, assigneeId }),
       normalizeTask({ id: crypto.randomUUID(), phase, title, description, status, priority, assigneeId }),
     );
 
     saveTasks(tasks);
     event.target.reset();
     assigneeInput.value = assignees[0].id;
+    phaseFilter.value = 'all';
+    priorityFilter.value = 'all';
+    searchInput.value = '';
     dialog.close();
     renderBoard();
   });

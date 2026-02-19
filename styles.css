@@ -177,6 +177,14 @@ dialog {
   color: var(--text);
 }
 #taskForm { display: grid; gap: 0.6rem; }
+
+.form-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+.actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
+
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; }
 .actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
 
