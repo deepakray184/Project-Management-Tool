@@ -1,72 +1,23 @@
-# SOC-Project-Management-Tool
+# SOC Project Management Tool
 
 A dynamic Jira-style Kanban dashboard for SOC project execution.
 
 ## Features
 
-- Preloaded with the provided SOC implementation phases and tasks.
-- Jira-like workflow columns:
-- Drag-and-drop task movement across statuses:
-  - To Do
-  - In Progress
-  - Review
-  - Completed
-- Swimlanes by phase inside each status column.
-- Assignee avatars on each card.
-- Priority chips (`Highest`, `High`, `Medium`, `Low`) with filtering.
-- Live search across phase, task title, description, and assignee.
-- Dynamic progress cards (total, per status, completion percentage).
-- Phase-based filtering.
-- Add/delete tasks directly from the UI.
-- Light/Dark theme toggle with persistent preference.
-- Local storage persistence so board updates remain after refresh.
+- Preloaded with SOC implementation phases and tasks.
+- Four workflow columns: To Do, In Progress, In QA, and Done.
+- Drag-and-drop task movement between columns.
+- Priority, phase, and free-text filters.
+- Assignee display on each task card.
+- Add and delete tasks from the UI.
+- Live summary cards with completion percentage.
+- Persistent local storage for tasks and theme preference.
 
 ## Run locally
 
-Use any of these commands (all start the same static server):
-
 ```bash
-npm run dev
-# or
-npm start
-# or
-npm run preview
-- Dynamic progress cards (total, per status, completion percentage).
-- Phase-based filtering.
-- Add/delete tasks directly from the UI.
-- Local storage persistence so board updates remain after refresh.
-- Modern blue gradient background for a professional dashboard appearance.
-
-## Run locally (recommended)
-
-```bash
+npm install
 npm start
 ```
 
-Then open:
-
-- `http://localhost:8000`
-- or `http://127.0.0.1:8000`
-
-## Alternative run command
-
-```bash
-python3 -m http.server 8000
-```
-
-## Troubleshooting "Not Found"
-
-- Make sure you run the command **inside this repository folder** (`/workspace/Project-Management-Tool`).
-- Use exactly `http://localhost:8000` (or `http://localhost:8000/index.html`).
-- If your preview tool automatically runs `npm run dev`, this repo now supports that directly.
-- If port `8000` is busy, run with another port:
-
-```bash
-PORT=8080 npm run dev
-- If port `8000` is busy, run with another port:
-
-```bash
-PORT=8080 npm start
-```
-
-Then open `http://localhost:8080`.
+Then open `http://localhost:8000`.
