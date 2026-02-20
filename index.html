@@ -8,6 +8,24 @@
   </head>
   <body>
     <main class="dashboard">
+      <section id="authView" class="auth-card">
+        <h1>SOC Collaboration Board</h1>
+        <p class="subtitle">Sign in so your colleagues can collaborate, edit tasks, comment, and change status.</p>
+
+        <div class="auth-tabs">
+          <button id="showLogin" class="btn" type="button">Login</button>
+          <button id="showSignup" class="btn secondary" type="button">Sign Up</button>
+        </div>
+
+        <form id="authForm">
+          <label>Name <input id="nameInput" placeholder="Only for sign up" /></label>
+          <label>Email <input id="emailInput" type="email" required placeholder="you@company.com" /></label>
+          <label>Password <input id="passwordInput" type="password" required placeholder="Minimum 6 characters" /></label>
+          <button id="authSubmit" class="btn" type="submit">Login</button>
+          <p id="authMessage" class="form-note"></p>
+        </form>
+
+        <p class="form-note">Demo users: <strong>elena@soc.local</strong> / <strong>password123</strong>, <strong>ravi@soc.local</strong> / <strong>password123</strong>.</p>
       <header class="topbar">
         <div>
           <p class="eyebrow">Projects / SOC Delivery</p>
@@ -41,7 +59,44 @@
         <button id="addTaskBtn" class="btn" type="button">+ Add Task</button>
       </section>
 
-      <section class="board" id="kanbanBoard" aria-label="Kanban board"></section>
+      <section id="appView" class="hidden">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Projects / SOC Delivery</p>
+            <h1>Board</h1>
+            <p class="subtitle">Shared Kanban board for team collaboration.</p>
+          </div>
+          <div class="topbar-actions">
+            <span id="currentUser" class="user-badge"></span>
+            <button id="logoutBtn" class="btn secondary" type="button">Logout</button>
+            <button id="themeToggle" class="btn secondary" type="button">🌙 Dark</button>
+            <button id="resetBoard" class="btn secondary" type="button">Reset</button>
+          </div>
+        </header>
+
+        <section class="summary" id="summaryCards" aria-label="Summary"></section>
+
+        <section class="toolbar" aria-label="Board controls">
+          <label for="phaseFilter">Phase</label>
+          <select id="phaseFilter"></select>
+
+          <label for="priorityFilter">Priority</label>
+          <select id="priorityFilter">
+            <option value="all">All priorities</option>
+            <option value="highest">Highest</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+
+          <label for="searchInput">Search</label>
+          <input id="searchInput" type="search" placeholder="Search tasks, phases, descriptions, assignees" />
+
+          <button id="addTaskBtn" class="btn" type="button">+ Add Task</button>
+        </section>
+
+        <section class="board" id="kanbanBoard" aria-label="Kanban board"></section>
+      </section>
     </main>
 
     <dialog id="taskDialog">
@@ -49,19 +104,38 @@
         <h2 id="dialogTitle">Add New Task</h2>
         <input type="hidden" id="editingTaskId" />
 
+        <label>Phase <input type="text" id="phaseInput" required placeholder="e.g. 3. INTEGRATION" /></label>
+        <label>Task Name <input type="text" id="taskInput" required placeholder="Task title" /></label>
+        <label>Description <textarea id="descriptionInput" rows="3" required placeholder="Task details"></textarea></label>
         <label>
           Phase
           <input type="text" id="phaseInput" required placeholder="e.g. 3. INTEGRATION" />
         </label>
 
-        <label>
-          Task Name
-          <input type="text" id="taskInput" required placeholder="Task title" />
+        <p class="form-note" id="createNote">New tasks are always created in <strong>To Do</strong>.</p>
+
+        <label id="statusField" class="hidden">Status
+          <select id="statusInput">
+            <option value="todo">To Do</option>
+            <option value="inprogress">In Progress</option>
+            <option value="review">In QA</option>
+            <option value="done">Done</option>
+          </select>
         </label>
 
-        <label>
-          Description
-          <textarea id="descriptionInput" rows="3" required placeholder="Task details"></textarea>
+        <label>Priority
+          <select id="priorityInput">
+            <option value="highest">Highest</option>
+            <option value="high">High</option>
+            <option value="medium" selected>Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </label>
+
+        <label>Assignee <select id="assigneeInput"></select></label>
+
+        <label>Add Comment (optional)
+          <textarea id="commentInput" rows="2" placeholder="Add update for colleagues"></textarea>
         </label>
 
         <p class="form-note" id="createNote">New tasks are always created in <strong>To Do</strong>.</p>
@@ -150,10 +224,11 @@
         <p class="description"></p>
         <div class="task-meta">
           <span class="priority-chip"></span>
-          <div class="assignee" title="Assignee">
-            <span class="avatar"></span>
-            <span class="assignee-name"></span>
-          </div>
+          <div class="assignee" title="Assignee"><span class="assignee-name"></span></div>
+        </div>
+        <div class="comments-wrap">
+          <strong>Comments</strong>
+          <ul class="comment-list"></ul>
         </div>
       </article>
     </template>
