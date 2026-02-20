@@ -26,6 +26,7 @@ body[data-theme='light'] {
 }
 
 * { box-sizing: border-box; }
+.hidden { display: none !important; }
 
 body {
   margin: 0;
@@ -37,6 +38,29 @@ body {
     linear-gradient(120deg, var(--bg-1), var(--bg-2));
 }
 
+.dashboard { width: min(1450px, 95vw); margin: 1.4rem auto; }
+.auth-card {
+  max-width: 520px;
+  margin: 6vh auto;
+  padding: 1rem;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: grid;
+  gap: 0.65rem;
+}
+.auth-tabs { display: flex; gap: 0.5rem; }
+.auth-card form { display: grid; gap: 0.6rem; }
+
+.topbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+.topbar-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+.user-badge { font-size: 0.82rem; color: var(--muted); }
+.eyebrow { margin: 0; color: #93c5fd; font-weight: 600; }
+h1 { margin: 0.35rem 0; font-size: clamp(1.6rem, 1.2rem + 1vw, 2.3rem); }
+.subtitle { margin: 0 0 1rem; color: var(--muted); }
+
+.summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 0.7rem; margin-bottom: 0.9rem; }
+.summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0.75rem; }
 .dashboard {
   width: min(1450px, 95vw);
   margin: 1.4rem auto;
@@ -88,6 +112,26 @@ select, input, textarea {
   border-radius: 8px;
   padding: 0.5rem 0.65rem;
 }
+
+.btn { border: 0; border-radius: 8px; background: #2563eb; color: #fff; font-weight: 600; padding: 0.55rem 0.95rem; cursor: pointer; }
+.btn.secondary { background: #334155; }
+
+.board { display: grid; grid-template-columns: repeat(4, minmax(260px, 1fr)); gap: 0.8rem; }
+.column { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; min-height: 70vh; display: flex; flex-direction: column; }
+.column-header { padding: 0.75rem; border-bottom: 1px solid var(--border); }
+.column-header h2 { margin: 0; font-size: 1rem; }
+.column-header small { color: var(--muted); }
+.task-list { padding: 0.75rem; display: flex; flex-direction: column; gap: 0.6rem; }
+
+.task-card { background: var(--card); border-left: 4px solid var(--todo); border-radius: 10px; padding: 0.7rem; box-shadow: 0 4px 12px rgba(2, 6, 23, 0.18); }
+.task-card[data-status='inprogress'] { border-left-color: var(--inprogress); }
+.task-card[data-status='review'] { border-left-color: var(--review); }
+.task-card[data-status='done'] { border-left-color: var(--done); }
+.task-header { display: flex; justify-content: space-between; gap: 0.5rem; }
+.task-header h3 { margin: 0; font-size: 0.95rem; }
+.task-card .phase { margin: 0.3rem 0; color: #93c5fd; font-size: 0.75rem; }
+.task-card .description { margin: 0; color: var(--muted); font-size: 0.82rem; }
+.task-meta { margin-top: 0.55rem; display: flex; justify-content: space-between; align-items: center; }
 
 .btn {
   border: 0;
@@ -153,6 +197,19 @@ body[data-theme='light'] .task-card .phase { color: #1d4ed8; }
 .priority-chip[data-priority='high'] { background: var(--chip-high); }
 .priority-chip[data-priority='medium'] { background: var(--chip-medium); }
 .priority-chip[data-priority='low'] { background: var(--chip-low); }
+.assignee { color: var(--muted); font-size: 0.75rem; }
+
+.edit { border: 0; background: transparent; color: #38bdf8; cursor: pointer; font-size: 1rem; }
+.comments-wrap { margin-top: 0.45rem; border-top: 1px dashed var(--border); padding-top: 0.45rem; }
+.comments-wrap strong { font-size: 0.72rem; color: var(--muted); }
+.comment-list { margin: 0.3rem 0 0; padding-left: 1rem; }
+.comment-item { font-size: 0.74rem; margin-bottom: 0.2rem; }
+.comment-item small { color: var(--muted); }
+.comment-item.muted { color: var(--muted); list-style: none; margin-left: -1rem; }
+
+dialog { width: min(480px, 92vw); border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); }
+#taskForm { display: grid; gap: 0.6rem; }
+.form-note { margin: 0; color: var(--muted); font-size: 0.84rem; }
 
 .assignee { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--muted); font-size: 0.75rem; }
 .avatar {
