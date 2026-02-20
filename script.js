@@ -1,64 +1,26 @@
 const statuses = [
   { id: 'todo', label: 'To Do' },
   { id: 'inprogress', label: 'In Progress' },
-  { id: 'review', label: 'Review' },
-  { id: 'done', label: 'Completed' },
+  { id: 'review', label: 'In QA' },
+  { id: 'done', label: 'Done' },
 ];
-
 const priorities = ['highest', 'high', 'medium', 'low'];
 
-const assignees = [
-  { id: 'elena', name: 'Elena', initials: 'EL', color: '#0ea5e9' },
-  { id: 'ravi', name: 'Ravi', initials: 'RV', color: '#6366f1' },
-  { id: 'sara', name: 'Sara', initials: 'SR', color: '#14b8a6' },
-  { id: 'david', name: 'David', initials: 'DV', color: '#f59e0b' },
-  { id: 'omar', name: 'Omar', initials: 'OM', color: '#ef4444' },
-];
-
-const baseTasks = [
-const initialTasks = [
-  ['1. SALES & PRE-SALES', 'First Customer Call', 'SOC Presentation of capabilities'],
-  ['1. SALES & PRE-SALES', 'Collect Source Details', 'Share sheet to collect source details'],
-  ['1. SALES & PRE-SALES', 'Estimate Size & Cost', 'Calculate SOC cost based on EPS/GB'],
-  ['1. SALES & PRE-SALES', 'BDM Share Cost', 'Business Development Manager shares proposal'],
-  ['1. SALES & PRE-SALES', 'PO Signed', 'Customer signs Purchase Order'],
-  ['1. SALES & PRE-SALES', 'Project Start Announced', 'Internal kickoff announcement'],
-  ['2. ONBOARDING & ACCESS', 'Share Process Docs', 'Customer process docs for Azure Lighthouse & FreshService'],
-  ['2. ONBOARDING & ACCESS', 'Email Elena', 'SOC shares mail for Lighthouse & FreshService setup'],
-  ['2. ONBOARDING & ACCESS', 'Customer Accepts Lighthouse', 'Wait for customer approval on Azure'],
-  ['2. ONBOARDING & ACCESS', 'XDR Portal Access', 'SOC shares user list for access'],
-  ['3. INTEGRATION', 'Content Hub Connectors', 'Install all data connectors'],
-  ['3. INTEGRATION', 'Microsoft Products', 'Connect 365, Azure AD, Defender, etc.'],
-  ['3. INTEGRATION', 'Collector Configuration', 'Assist in collector setup'],
-  ['3. INTEGRATION', 'Server Integration', 'Onboard all Linux and Windows Servers'],
-  ['3. INTEGRATION', 'Network Integration', 'Configure Firewalls and Network Devices'],
-  ['3. INTEGRATION', 'Other Sources', 'Connect remaining log sources'],
-  ['4. CONFIGURATION & USE CASES', 'Enable Use Cases', 'Prefix Customer_SOC(DeviceName)'],
-  ['4. CONFIGURATION & USE CASES', 'Custom Use Cases', 'Configure specific customer scenarios'],
-  ['4. CONFIGURATION & USE CASES', 'Enable Workbooks', 'Activate standard dashboard workbooks'],
-  ['4. CONFIGURATION & USE CASES', 'Custom Workbooks', 'Build custom visualizations'],
-  ['5. AUTOMATION & RESPONSE', 'Enable Playbooks', 'Activate standard response playbooks'],
-  ['5. AUTOMATION & RESPONSE', 'FreshService Playbooks', 'Ticket creation automation'],
-  ['5. AUTOMATION & RESPONSE', 'Email Notifications', 'Configure alert routing'],
-  ['5. AUTOMATION & RESPONSE', 'Investigation Automations', 'Auto-enrichment rules'],
-  ['6. GO LIVE & SUSTAIN', 'Go Live Mail', 'Send formal project completion mail'],
-  ['6. GO LIVE & SUSTAIN', 'Start Monitoring', 'SOC Team begins 24/7 watch'],
-  ['6. GO LIVE & SUSTAIN', 'Continuous Fine-tuning', 'Ongoing rule adjustment'],
-];
-
-const initialTasks = baseTasks.map(([phase, title, description], index) => ({
-].map(([phase, title, description], index) => ({
-  id: crypto.randomUUID(),
-  phase,
-  title,
-  description,
-  status: index % 6 === 0 ? 'inprogress' : index % 9 === 0 ? 'done' : index % 4 === 0 ? 'review' : 'todo',
-  priority: priorities[index % priorities.length],
-  assigneeId: assignees[index % assignees.length].id,
-}));
-
-const storageKey = 'soc-kanban-tasks-v2';
 const themeKey = 'soc-kanban-theme';
+const tokenKey = 'soc-kanban-token';
+
+const authView = document.getElementById('authView');
+const appView = document.getElementById('appView');
+const authForm = document.getElementById('authForm');
+const authMessage = document.getElementById('authMessage');
+const authSubmit = document.getElementById('authSubmit');
+const showLogin = document.getElementById('showLogin');
+const showSignup = document.getElementById('showSignup');
+const nameInput = document.getElementById('nameInput');
+const emailInput = document.getElementById('emailInput');
+const passwordInput = document.getElementById('passwordInput');
+const currentUserBadge = document.getElementById('currentUser');
+const logoutBtn = document.getElementById('logoutBtn');
 
 const board = document.getElementById('kanbanBoard');
 const phaseFilter = document.getElementById('phaseFilter');
@@ -67,69 +29,64 @@ const searchInput = document.getElementById('searchInput');
 const summary = document.getElementById('summaryCards');
 const taskTemplate = document.getElementById('taskCardTemplate');
 const dialog = document.getElementById('taskDialog');
+const taskForm = document.getElementById('taskForm');
+const dialogTitle = document.getElementById('dialogTitle');
+const editingTaskIdInput = document.getElementById('editingTaskId');
+const statusField = document.getElementById('statusField');
+const createNote = document.getElementById('createNote');
+const statusInput = document.getElementById('statusInput');
+const priorityInput = document.getElementById('priorityInput');
 const assigneeInput = document.getElementById('assigneeInput');
+const commentInput = document.getElementById('commentInput');
+const saveTaskBtn = document.getElementById('saveTaskBtn');
 const themeToggle = document.getElementById('themeToggle');
+const phaseInput = document.getElementById('phaseInput');
+const taskInput = document.getElementById('taskInput');
+const descriptionInput = document.getElementById('descriptionInput');
 
-function assigneeById(assigneeId) {
-  return assignees.find((member) => member.id === assigneeId) || assignees[0];
+let authMode = 'login';
+let token = localStorage.getItem(tokenKey) || '';
+let currentUser = null;
+let users = [];
+let tasks = [];
+
+function api(path, options = {}) {
+  return fetch(path, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers || {}),
+    },
+  }).then(async (res) => {
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(body.error || 'Request failed');
+    return body;
+  });
 }
 
-function titleCase(value) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
+function setAuthMode(mode) {
+  authMode = mode;
+  authSubmit.textContent = mode === 'login' ? 'Login' : 'Create Account';
+  nameInput.parentElement.classList.toggle('hidden', mode === 'login');
+  showLogin.classList.toggle('secondary', mode !== 'login');
+  showSignup.classList.toggle('secondary', mode !== 'signup');
+  authMessage.textContent = '';
 }
 
-function normalizeTask(task, index = 0) {
-  return {
-    id: task.id || crypto.randomUUID(),
-    phase: task.phase || 'Uncategorized',
-    title: task.title || 'Untitled Task',
-    description: task.description || '',
-    status: statuses.some((s) => s.id === task.status) ? task.status : 'todo',
-    priority: priorities.includes(task.priority) ? task.priority : priorities[index % priorities.length],
-    assigneeId: assigneeById(task.assigneeId).id,
-  };
+function setAppVisibility(isLoggedIn) {
+  authView.classList.toggle('hidden', isLoggedIn);
+  appView.classList.toggle('hidden', !isLoggedIn);
 }
-
-function loadTasks() {
-  const raw = localStorage.getItem(storageKey);
-  if (!raw) return initialTasks;
-
-  try {
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return initialTasks;
-    return parsed.map((task, index) => normalizeTask(task, index));
-  } catch {
-    return initialTasks;
-  }
-  status: index % 6 === 0 ? 'inprogress' : index % 9 === 0 ? 'done' : 'todo',
-}));
-
-const storageKey = 'soc-kanban-tasks';
-const board = document.getElementById('kanbanBoard');
-const phaseFilter = document.getElementById('phaseFilter');
-const summary = document.getElementById('summaryCards');
-const taskTemplate = document.getElementById('taskCardTemplate');
-const dialog = document.getElementById('taskDialog');
-
-function loadTasks() {
-  const raw = localStorage.getItem(storageKey);
-  return raw ? JSON.parse(raw) : initialTasks;
-}
-
-function saveTasks(tasks) {
-  localStorage.setItem(storageKey, JSON.stringify(tasks));
-}
-
-let tasks = loadTasks();
 
 function getPhases() {
-  return [...new Set(tasks.map((task) => task.phase))];
+  return [...new Set(tasks.map((task) => task.phase))].sort((a, b) => a.localeCompare(b));
 }
 
 function populateSelectOptions() {
   const selectedPhase = phaseFilter.value || 'all';
-function populatePhaseFilter() {
-  const selected = phaseFilter.value || 'all';
+  const selectedAssignee = assigneeInput.value || (users[0] ? users[0].id : '');
+
   phaseFilter.innerHTML = '';
   [['all', 'All Phases'], ...getPhases().map((phase) => [phase, phase])].forEach(([value, label]) => {
     const option = document.createElement('option');
@@ -137,17 +94,16 @@ function populatePhaseFilter() {
     option.textContent = label;
     phaseFilter.append(option);
   });
-  phaseFilter.value = selectedPhase;
+  phaseFilter.value = getPhases().includes(selectedPhase) || selectedPhase === 'all' ? selectedPhase : 'all';
 
-  const selectedAssignee = assigneeInput.value || assignees[0].id;
   assigneeInput.innerHTML = '';
-  assignees.forEach((person) => {
+  users.forEach((person) => {
     const option = document.createElement('option');
     option.value = person.id;
-    option.textContent = `${person.name} (${person.initials})`;
+    option.textContent = `${person.name} (${person.email})`;
     assigneeInput.append(option);
   });
-  assigneeInput.value = selectedAssignee;
+  assigneeInput.value = users.some((person) => person.id === selectedAssignee) ? selectedAssignee : users[0]?.id || '';
 }
 
 function getVisibleTasks() {
@@ -156,69 +112,99 @@ function getVisibleTasks() {
   const searchTerm = searchInput.value.trim().toLowerCase();
 
   return tasks.filter((task) => {
-    const assignee = assigneeById(task.assigneeId);
+    const assignee = users.find((user) => user.id === task.assigneeId);
     const matchesPhase = phase === 'all' || task.phase === phase;
     const matchesPriority = priority === 'all' || task.priority === priority;
-    const searchable = `${task.phase} ${task.title} ${task.description} ${assignee.name}`.toLowerCase();
+    const searchable = `${task.phase} ${task.title} ${task.description} ${(assignee && assignee.name) || ''}`.toLowerCase();
     const matchesSearch = !searchTerm || searchable.includes(searchTerm);
     return matchesPhase && matchesPriority && matchesSearch;
   });
-  phaseFilter.value = selected;
-}
-
-function getVisibleTasks() {
-  return phaseFilter.value === 'all' ? tasks : tasks.filter((task) => task.phase === phaseFilter.value);
 }
 
 function renderSummary(visibleTasks) {
   const doneCount = visibleTasks.filter((task) => task.status === 'done').length;
   const progress = visibleTasks.length ? Math.round((doneCount / visibleTasks.length) * 100) : 0;
-
   const cards = [
-    ['Total Tasks', visibleTasks.length],
+    ['Total', visibleTasks.length],
     ...statuses.map((status) => [status.label, visibleTasks.filter((task) => task.status === status.id).length]),
     ['Completion', `${progress}%`],
   ];
-
   summary.innerHTML = cards
     .map(([title, value]) => `<article class="summary-card"><h2>${title}</h2><p>${value}</p></article>`)
-    ['Progress', `${progress}%`],
-  ];
-
-  summary.innerHTML = cards
-    .map(
-      ([title, value]) =>
-        `<article class="summary-card"><h2>${title}</h2><p>${value}</p></article>`,
-    )
     .join('');
 }
 
-function onDeleteTask(id) {
-  tasks = tasks.filter((task) => task.id !== id);
-  saveTasks(tasks);
-  renderBoard();
+function resetDialogToCreateMode() {
+  editingTaskIdInput.value = '';
+  dialogTitle.textContent = 'Add New Task';
+  saveTaskBtn.textContent = 'Save Task';
+  statusField.classList.add('hidden');
+  createNote.classList.remove('hidden');
+  statusInput.value = 'todo';
+}
+
+function openCreateDialog() {
+  populateSelectOptions();
+  taskForm.reset();
+  commentInput.value = '';
+  assigneeInput.value = users[0]?.id || '';
+  resetDialogToCreateMode();
+  dialog.showModal();
+}
+
+function openEditDialog(task) {
+  populateSelectOptions();
+  editingTaskIdInput.value = task.id;
+  dialogTitle.textContent = 'Edit Task';
+  saveTaskBtn.textContent = 'Update Task';
+  statusField.classList.remove('hidden');
+  createNote.classList.add('hidden');
+
+  phaseInput.value = task.phase;
+  taskInput.value = task.title;
+  descriptionInput.value = task.description;
+  priorityInput.value = task.priority;
+  assigneeInput.value = task.assigneeId;
+  statusInput.value = task.status;
+  commentInput.value = '';
+
+  dialog.showModal();
+}
+
+function renderComments(task, commentList) {
+  commentList.innerHTML = '';
+  const comments = Array.isArray(task.comments) ? task.comments.slice(-3).reverse() : [];
+  if (!comments.length) {
+    commentList.innerHTML = '<li class="comment-item muted">No comments yet</li>';
+    return;
+  }
+  comments.forEach((comment) => {
+    const li = document.createElement('li');
+    li.className = 'comment-item';
+    li.innerHTML = `<span>${comment.text}</span><small>— ${comment.authorName}</small>`;
+    commentList.append(li);
+  });
 }
 
 function createTaskCard(task) {
   const node = taskTemplate.content.firstElementChild.cloneNode(true);
-  const assignee = assigneeById(task.assigneeId);
+  const assignee = users.find((user) => user.id === task.assigneeId);
 
   node.dataset.id = task.id;
   node.dataset.status = task.status;
   node.querySelector('h3').textContent = task.title;
   node.querySelector('.phase').textContent = task.phase;
   node.querySelector('.description').textContent = task.description;
+  node.querySelector('.priority-chip').textContent = task.priority;
+  node.querySelector('.priority-chip').dataset.priority = task.priority;
+  node.querySelector('.assignee-name').textContent = assignee ? assignee.name : 'Unassigned';
 
-  const chip = node.querySelector('.priority-chip');
-  chip.dataset.priority = task.priority;
-  chip.textContent = titleCase(task.priority);
+  renderComments(task, node.querySelector('.comment-list'));
 
-  const avatar = node.querySelector('.avatar');
-  avatar.textContent = assignee.initials;
-  avatar.style.background = assignee.color;
-  node.querySelector('.assignee-name').textContent = assignee.name;
-
-  node.querySelector('.delete').addEventListener('click', () => onDeleteTask(task.id));
+  node.querySelector('.edit').addEventListener('click', (event) => {
+    event.stopPropagation();
+    openEditDialog(task);
+  });
 
   node.addEventListener('dragstart', (event) => {
     event.dataTransfer.setData('text/plain', task.id);
@@ -227,56 +213,27 @@ function createTaskCard(task) {
   return node;
 }
 
-function createSwimlane(phaseName, statusId, tasksForLane) {
-  const lane = document.createElement('section');
-  lane.className = 'swimlane';
-  lane.dataset.phase = phaseName;
-  lane.innerHTML = `<h3 class="swimlane-title">${phaseName}</h3><div class="task-list"></div>`;
-
-  const laneTaskList = lane.querySelector('.task-list');
-  if (!tasksForLane.length) {
-    const empty = document.createElement('div');
-    empty.className = 'empty-state';
-    empty.textContent = 'Drop a task here';
-    laneTaskList.append(empty);
-  }
-
-  tasksForLane.forEach((task) => laneTaskList.append(createTaskCard(task)));
-
-  lane.addEventListener('dragover', (event) => {
-    event.preventDefault();
-    lane.classList.add('drop-target');
+async function updateTask(taskId, patch) {
+  const response = await api(`/api/tasks/${taskId}`, {
+    method: 'PUT',
+    body: JSON.stringify(patch),
   });
+  const idx = tasks.findIndex((task) => task.id === taskId);
+  if (idx >= 0) tasks[idx] = response.task;
+}
 
-  lane.addEventListener('dragleave', () => {
-    lane.classList.remove('drop-target');
+async function addComment(taskId, text) {
+  if (!text.trim()) return;
+  const response = await api(`/api/tasks/${taskId}/comments`, {
+    method: 'POST',
+    body: JSON.stringify({ text: text.trim() }),
   });
-
-  lane.addEventListener('drop', (event) => {
-    event.preventDefault();
-    lane.classList.remove('drop-target');
-    const taskId = event.dataTransfer.getData('text/plain');
-    const task = tasks.find((item) => item.id === taskId);
-    if (!task) return;
-    task.status = statusId;
-    task.phase = phaseName;
-    saveTasks(tasks);
-    renderBoard();
-  });
-
-  return lane;
+  const idx = tasks.findIndex((task) => task.id === taskId);
+  if (idx >= 0) tasks[idx] = response.task;
 }
 
 function renderBoard() {
   populateSelectOptions();
-  const visibleTasks = getVisibleTasks();
-  renderSummary(visibleTasks);
-
-  const visiblePhases = [...new Set(visibleTasks.map((task) => task.phase))];
-  const phasesToRender = visiblePhases.length ? visiblePhases : getPhases();
-
-function renderBoard() {
-  populatePhaseFilter();
   const visibleTasks = getVisibleTasks();
   renderSummary(visibleTasks);
 
@@ -288,13 +245,6 @@ function renderBoard() {
     column.dataset.status = status.id;
 
     const count = visibleTasks.filter((task) => task.status === status.id).length;
-    column.innerHTML = `<header class="column-header"><h2>${status.label}</h2><small>${count} task${count === 1 ? '' : 's'}</small></header><div class="swimlane-list"></div>`;
-
-    const swimlaneList = column.querySelector('.swimlane-list');
-    phasesToRender.forEach((phaseName) => {
-      const laneTasks = visibleTasks.filter((task) => task.status === status.id && task.phase === phaseName);
-      swimlaneList.append(createSwimlane(phaseName, status.id, laneTasks));
-    });
     column.innerHTML = `
       <header class="column-header">
         <h2>${status.label}</h2>
@@ -308,26 +258,28 @@ function renderBoard() {
       column.classList.add('drop-target');
     });
 
-    column.addEventListener('dragleave', () => {
-      column.classList.remove('drop-target');
-    });
+    column.addEventListener('dragleave', () => column.classList.remove('drop-target'));
 
-    column.addEventListener('drop', (event) => {
+    column.addEventListener('drop', async (event) => {
       event.preventDefault();
       column.classList.remove('drop-target');
       const taskId = event.dataTransfer.getData('text/plain');
       const task = tasks.find((item) => item.id === taskId);
       if (!task) return;
-      task.status = status.id;
-      saveTasks(tasks);
+      await updateTask(taskId, { status: status.id });
       renderBoard();
     });
 
     const list = column.querySelector('.task-list');
-    visibleTasks
-      .filter((task) => task.status === status.id)
-      .forEach((task) => list.append(createTaskCard(task)));
-
+    const tasksForStatus = visibleTasks.filter((task) => task.status === status.id);
+    if (!tasksForStatus.length) {
+      const empty = document.createElement('div');
+      empty.className = 'empty-state';
+      empty.textContent = 'No tasks in this column';
+      list.append(empty);
+    } else {
+      tasksForStatus.forEach((task) => list.append(createTaskCard(task)));
+    }
     board.append(column);
   });
 }
@@ -343,74 +295,123 @@ function initializeTheme() {
   applyTheme(saved === 'light' ? 'light' : 'dark');
 }
 
+async function bootstrapBoard() {
+  const [userResponse, usersResponse, tasksResponse] = await Promise.all([
+    api('/api/me'),
+    api('/api/users'),
+    api('/api/tasks'),
+  ]);
+
+  currentUser = userResponse.user;
+  users = usersResponse.users;
+  tasks = tasksResponse.tasks;
+
+  currentUserBadge.textContent = `Signed in: ${currentUser.name}`;
+  setAppVisibility(true);
+  renderBoard();
+}
+
 function attachEventListeners() {
+  showLogin.addEventListener('click', () => setAuthMode('login'));
+  showSignup.addEventListener('click', () => setAuthMode('signup'));
+
+  authForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    try {
+      authMessage.textContent = '';
+      const payload = {
+        email: emailInput.value.trim(),
+        password: passwordInput.value,
+      };
+      const endpoint = authMode === 'login' ? '/api/auth/login' : '/api/auth/signup';
+      if (authMode === 'signup') payload.name = nameInput.value.trim();
+      const response = await api(endpoint, { method: 'POST', body: JSON.stringify(payload) });
+      token = response.token;
+      localStorage.setItem(tokenKey, token);
+      await bootstrapBoard();
+    } catch (error) {
+      authMessage.textContent = error.message;
+    }
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    token = '';
+    currentUser = null;
+    localStorage.removeItem(tokenKey);
+    setAppVisibility(false);
+  });
+
   phaseFilter.addEventListener('change', renderBoard);
   priorityFilter.addEventListener('change', renderBoard);
   searchInput.addEventListener('input', renderBoard);
+  themeToggle.addEventListener('click', () => applyTheme(document.body.dataset.theme === 'light' ? 'dark' : 'light'));
 
-  themeToggle.addEventListener('click', () => {
-    const current = document.body.dataset.theme === 'light' ? 'light' : 'dark';
-    applyTheme(current === 'light' ? 'dark' : 'light');
-  });
-
-  document.getElementById('addTaskBtn').addEventListener('click', () => {
-    populateSelectOptions();
-function attachEventListeners() {
-  phaseFilter.addEventListener('change', renderBoard);
-
-  document.getElementById('addTaskBtn').addEventListener('click', () => {
-    dialog.showModal();
-  });
-
+  document.getElementById('addTaskBtn').addEventListener('click', openCreateDialog);
   document.getElementById('cancelDialog').addEventListener('click', () => dialog.close());
 
-  document.getElementById('taskForm').addEventListener('submit', (event) => {
+  taskForm.addEventListener('submit', async (event) => {
     event.preventDefault();
 
-    const phase = document.getElementById('phaseInput').value.trim();
-    const title = document.getElementById('taskInput').value.trim();
-    const description = document.getElementById('descriptionInput').value.trim();
-    const status = document.getElementById('statusInput').value;
-    const priority = document.getElementById('priorityInput').value;
-    const assigneeId = assigneeInput.value;
+    const payload = {
+      phase: phaseInput.value.trim(),
+      title: taskInput.value.trim(),
+      description: descriptionInput.value.trim(),
+      status: statusInput.value,
+      priority: priorityInput.value,
+      assigneeId: assigneeInput.value,
+    };
 
-    if (!phase || !title || !description) return;
+    if (!payload.phase || !payload.title || !payload.description) return;
 
-    tasks.unshift(
-      normalizeTask({
-        id: crypto.randomUUID(),
-        phase,
-        title,
-        description,
-        status,
-        priority,
-        assigneeId,
-      }),
-    );
+    const editingTaskId = editingTaskIdInput.value;
+    if (editingTaskId) {
+      await updateTask(editingTaskId, payload);
+      await addComment(editingTaskId, commentInput.value);
+    } else {
+      const response = await api('/api/tasks', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      tasks.unshift(response.task);
+      if (commentInput.value.trim()) {
+        await addComment(response.task.id, commentInput.value);
+      }
+      phaseFilter.value = 'all';
+      priorityFilter.value = 'all';
+      searchInput.value = '';
+    }
 
-    saveTasks(tasks);
-    event.target.reset();
-    assigneeInput.value = assignees[0].id;
-
-    if (!phase || !title || !description) return;
-
-    tasks.unshift({ id: crypto.randomUUID(), phase, title, description, status });
-    saveTasks(tasks);
-    event.target.reset();
     dialog.close();
+    taskForm.reset();
+    resetDialogToCreateMode();
     renderBoard();
   });
 
-  document.getElementById('resetBoard').addEventListener('click', () => {
-    tasks = [...initialTasks];
+  dialog.addEventListener('close', () => {
+    resetDialogToCreateMode();
+    taskForm.reset();
+  });
+
+  document.getElementById('resetBoard').addEventListener('click', async () => {
     phaseFilter.value = 'all';
     priorityFilter.value = 'all';
     searchInput.value = '';
-    saveTasks(tasks);
+    const tasksResponse = await api('/api/tasks');
+    tasks = tasksResponse.tasks;
     renderBoard();
   });
 }
 
 initializeTheme();
+setAuthMode('login');
+setAppVisibility(false);
+resetDialogToCreateMode();
 attachEventListeners();
-renderBoard();
+
+if (token) {
+  bootstrapBoard().catch(() => {
+    token = '';
+    localStorage.removeItem(tokenKey);
+    setAppVisibility(false);
+  });
+}
