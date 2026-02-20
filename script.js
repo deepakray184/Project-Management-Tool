@@ -6,6 +6,40 @@ const statuses = [
 ];
 const priorities = ['highest', 'high', 'medium', 'low'];
 
+const assignees = [
+  { id: 'elena', name: 'Elena', initials: 'EL', color: '#0ea5e9' },
+  { id: 'ravi', name: 'Ravi', initials: 'RV', color: '#6366f1' },
+  { id: 'sara', name: 'Sara', initials: 'SR', color: '#14b8a6' },
+  { id: 'david', name: 'David', initials: 'DV', color: '#f59e0b' },
+  { id: 'omar', name: 'Omar', initials: 'OM', color: '#ef4444' },
+];
+
+const baseTasks = [
+  ['1. SALES & PRE-SALES', 'First Customer Call', 'SOC Presentation of capabilities'],
+  ['1. SALES & PRE-SALES', 'Collect Source Details', 'Share sheet to collect source details'],
+  ['1. SALES & PRE-SALES', 'Estimate Size & Cost', 'Calculate SOC cost based on EPS/GB'],
+  ['2. ONBOARDING & ACCESS', 'Share Process Docs', 'Customer process docs for Azure Lighthouse & FreshService'],
+  ['2. ONBOARDING & ACCESS', 'Customer Accepts Lighthouse', 'Wait for customer approval on Azure'],
+  ['3. INTEGRATION', 'Content Hub Connectors', 'Install all data connectors'],
+  ['3. INTEGRATION', 'Server Integration', 'Onboard all Linux and Windows servers'],
+  ['4. CONFIGURATION & USE CASES', 'Enable Use Cases', 'Prefix Customer_SOC(DeviceName)'],
+  ['4. CONFIGURATION & USE CASES', 'Custom Workbooks', 'Build custom visualizations'],
+  ['5. AUTOMATION & RESPONSE', 'Enable Playbooks', 'Activate standard response playbooks'],
+  ['5. AUTOMATION & RESPONSE', 'Email Notifications', 'Configure alert routing'],
+  ['6. GO LIVE & SUSTAIN', 'Go Live Mail', 'Send formal project completion mail'],
+];
+
+const initialTasks = baseTasks.map(([phase, title, description], index) => ({
+  id: crypto.randomUUID(),
+  phase,
+  title,
+  description,
+  status: index % 6 === 0 ? 'inprogress' : index % 9 === 0 ? 'done' : index % 4 === 0 ? 'review' : 'todo',
+  priority: priorities[index % priorities.length],
+  assigneeId: assignees[index % assignees.length].id,
+}));
+
+const storageKey = 'soc-kanban-tasks-v3';
 const themeKey = 'soc-kanban-theme';
 const tokenKey = 'soc-kanban-token';
 
@@ -72,6 +106,33 @@ function setAuthMode(mode) {
   showLogin.classList.toggle('secondary', mode !== 'login');
   showSignup.classList.toggle('secondary', mode !== 'signup');
   authMessage.textContent = '';
+
+function assigneeById(assigneeId) {
+  return assignees.find((member) => member.id === assigneeId) || assignees[0];
+}
+
+function normalizeTask(task, index = 0) {
+  return {
+    id: task.id || crypto.randomUUID(),
+    phase: (task.phase || 'Uncategorized').trim(),
+    title: (task.title || 'Untitled Task').trim(),
+    description: (task.description || '').trim(),
+    status: statuses.some((item) => item.id === task.status) ? task.status : 'todo',
+    priority: priorities.includes(task.priority) ? task.priority : priorities[index % priorities.length],
+    assigneeId: assigneeById(task.assigneeId).id,
+  };
+}
+
+function loadTasks() {
+  const raw = localStorage.getItem(storageKey);
+  if (!raw) return initialTasks;
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return initialTasks;
+    return parsed.map((task, index) => normalizeTask(task, index));
+  } catch {
+    return initialTasks;
+  }
 }
 
 function setAppVisibility(isLoggedIn) {
@@ -86,6 +147,7 @@ function getPhases() {
 function populateSelectOptions() {
   const selectedPhase = phaseFilter.value || 'all';
   const selectedAssignee = assigneeInput.value || (users[0] ? users[0].id : '');
+  const selectedAssignee = assigneeInput.value || assignees[0].id;
 
   phaseFilter.innerHTML = '';
   [['all', 'All Phases'], ...getPhases().map((phase) => [phase, phase])].forEach(([value, label]) => {
@@ -104,6 +166,7 @@ function populateSelectOptions() {
     assigneeInput.append(option);
   });
   assigneeInput.value = users.some((person) => person.id === selectedAssignee) ? selectedAssignee : users[0]?.id || '';
+  assigneeInput.value = assignees.some((person) => person.id === selectedAssignee) ? selectedAssignee : assignees[0].id;
 }
 
 function getVisibleTasks() {
@@ -200,6 +263,9 @@ function createTaskCard(task) {
   node.querySelector('.assignee-name').textContent = assignee ? assignee.name : 'Unassigned';
 
   renderComments(task, node.querySelector('.comment-list'));
+  const chip = node.querySelector('.priority-chip');
+  chip.dataset.priority = task.priority;
+  chip.textContent = task.priority;
 
   node.querySelector('.edit').addEventListener('click', (event) => {
     event.stopPropagation();
@@ -272,6 +338,7 @@ function renderBoard() {
 
     const list = column.querySelector('.task-list');
     const tasksForStatus = visibleTasks.filter((task) => task.status === status.id);
+
     if (!tasksForStatus.length) {
       const empty = document.createElement('div');
       empty.className = 'empty-state';
@@ -280,6 +347,7 @@ function renderBoard() {
     } else {
       tasksForStatus.forEach((task) => list.append(createTaskCard(task)));
     }
+
     board.append(column);
   });
 }
@@ -339,6 +407,9 @@ function attachEventListeners() {
     currentUser = null;
     localStorage.removeItem(tokenKey);
     setAppVisibility(false);
+  document.getElementById('addTaskBtn').addEventListener('click', () => {
+    populateSelectOptions();
+    dialog.showModal();
   });
 
   phaseFilter.addEventListener('change', renderBoard);
@@ -381,6 +452,25 @@ function attachEventListeners() {
       searchInput.value = '';
     }
 
+    const phase = document.getElementById('phaseInput').value.trim();
+    const title = document.getElementById('taskInput').value.trim();
+    const description = document.getElementById('descriptionInput').value.trim();
+    const priority = document.getElementById('priorityInput').value;
+    const assigneeId = assigneeInput.value;
+
+    if (!phase || !title || !description) return;
+
+    tasks.unshift(
+      normalizeTask({ id: crypto.randomUUID(), phase, title, description, status: 'todo', priority, assigneeId }),
+      normalizeTask({ id: crypto.randomUUID(), phase, title, description, status, priority, assigneeId }),
+    );
+
+    saveTasks(tasks);
+    event.target.reset();
+    assigneeInput.value = assignees[0].id;
+    phaseFilter.value = 'all';
+    priorityFilter.value = 'all';
+    searchInput.value = '';
     dialog.close();
     taskForm.reset();
     resetDialogToCreateMode();
