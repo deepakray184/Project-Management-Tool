@@ -176,6 +176,7 @@ body[data-theme='light'] .task-card .phase { color: #1d4ed8; }
 .delete { color: #ef4444; }
 .edit:hover,
 .delete:hover { background: rgba(148, 163, 184, 0.2); }
+.delete { border: 0; background: transparent; color: #ef4444; cursor: pointer; font-size: 1.05rem; line-height: 1; }
 
 dialog {
   width: min(460px, 92vw);
@@ -191,6 +192,9 @@ dialog {
   color: var(--muted);
   font-size: 0.84rem;
 }
+.actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; }
 .actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
 
 .column.drop-target { outline: 2px dashed #60a5fa; }

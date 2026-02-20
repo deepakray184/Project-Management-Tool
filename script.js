@@ -221,6 +221,7 @@ function createTaskCard(task) {
     event.stopPropagation();
     onDeleteTask(task.id);
   });
+  node.querySelector('.delete').addEventListener('click', () => onDeleteTask(task.id));
 
   node.addEventListener('dragstart', (event) => {
     event.dataTransfer.setData('text/plain', task.id);
@@ -312,6 +313,9 @@ function attachEventListeners() {
   document.getElementById('cancelDialog').addEventListener('click', () => {
     dialog.close();
     resetDialogToCreateMode();
+  document.getElementById('addTaskBtn').addEventListener('click', () => {
+    populateSelectOptions();
+    dialog.showModal();
   });
 
   taskForm.addEventListener('submit', (event) => {
@@ -321,6 +325,7 @@ function attachEventListeners() {
     const title = document.getElementById('taskInput').value.trim();
     const description = document.getElementById('descriptionInput').value.trim();
     const priority = priorityInput.value;
+    const priority = document.getElementById('priorityInput').value;
     const assigneeId = assigneeInput.value;
     const editingTaskId = editingTaskIdInput.value;
 
@@ -350,10 +355,17 @@ function attachEventListeners() {
       priorityFilter.value = 'all';
       searchInput.value = '';
     }
+    tasks.unshift(
+      normalizeTask({ id: crypto.randomUUID(), phase, title, description, status: 'todo', priority, assigneeId }),
+      normalizeTask({ id: crypto.randomUUID(), phase, title, description, status, priority, assigneeId }),
+    );
 
     saveTasks(tasks);
     taskForm.reset();
     assigneeInput.value = assignees[0].id;
+    phaseFilter.value = 'all';
+    priorityFilter.value = 'all';
+    searchInput.value = '';
     dialog.close();
     resetDialogToCreateMode();
     renderBoard();
