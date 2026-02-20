@@ -28,6 +28,8 @@ body[data-theme='light'] {
 * { box-sizing: border-box; }
 .hidden { display: none !important; }
 
+.hidden { display: none; }
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -186,6 +188,7 @@ body[data-theme='light'] .btn.secondary { background: #94a3b8; color: #0f172a; }
 .task-card[data-status='done'] { border-left-color: var(--done); }
 
 .task-header { display: flex; justify-content: space-between; gap: 0.5rem; }
+.task-actions { display: inline-flex; gap: 0.25rem; }
 .task-header h3 { margin: 0; font-size: 0.95rem; }
 .task-card .phase { margin: 0.3rem 0; color: #93c5fd; font-size: 0.75rem; }
 body[data-theme='light'] .task-card .phase { color: #1d4ed8; }
@@ -224,6 +227,12 @@ dialog { width: min(480px, 92vw); border: 1px solid var(--border); border-radius
   font-weight: 700;
 }
 
+.edit,
+.delete { border: 0; background: transparent; cursor: pointer; font-size: 1rem; line-height: 1; border-radius: 4px; padding: 0.1rem 0.2rem; }
+.edit { color: #38bdf8; }
+.delete { color: #ef4444; }
+.edit:hover,
+.delete:hover { background: rgba(148, 163, 184, 0.2); }
 .delete { border: 0; background: transparent; color: #ef4444; cursor: pointer; font-size: 1.05rem; line-height: 1; }
 
 dialog {

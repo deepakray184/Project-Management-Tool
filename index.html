@@ -138,6 +138,33 @@
           <textarea id="commentInput" rows="2" placeholder="Add update for colleagues"></textarea>
         </label>
 
+        <p class="form-note" id="createNote">New tasks are always created in <strong>To Do</strong>.</p>
+
+        <label id="statusField" class="hidden">
+          Status
+          <select id="statusInput">
+            <option value="todo">To Do</option>
+            <option value="inprogress">In Progress</option>
+            <option value="review">In QA</option>
+            <option value="done">Done</option>
+          </select>
+        </label>
+
+        <label>
+          Priority
+          <select id="priorityInput">
+            <option value="highest">Highest</option>
+            <option value="high">High</option>
+            <option value="medium" selected>Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </label>
+
+        <label>
+          Assignee
+          <select id="assigneeInput"></select>
+        </label>
+
         <p class="form-note">New tasks are always created in <strong>To Do</strong>.</p>
         <div class="form-grid">
           <label>
@@ -189,6 +216,7 @@
           <h3></h3>
           <div class="task-actions">
             <button class="edit" title="Edit task" type="button">✎</button>
+            <button class="delete" title="Delete task" type="button">×</button>
           </div>
           <button class="delete" title="Delete task" type="button">×</button>
         </div>

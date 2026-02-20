@@ -74,6 +74,7 @@ const assigneeInput = document.getElementById('assigneeInput');
 const commentInput = document.getElementById('commentInput');
 const saveTaskBtn = document.getElementById('saveTaskBtn');
 const themeToggle = document.getElementById('themeToggle');
+const saveTaskBtn = document.getElementById('saveTaskBtn');
 const phaseInput = document.getElementById('phaseInput');
 const taskInput = document.getElementById('taskInput');
 const descriptionInput = document.getElementById('descriptionInput');
@@ -135,6 +136,8 @@ function loadTasks() {
   }
 }
 
+function saveTasks(nextTasks) {
+  localStorage.setItem(storageKey, JSON.stringify(nextTasks));
 function setAppVisibility(isLoggedIn) {
   authView.classList.toggle('hidden', isLoggedIn);
   appView.classList.toggle('hidden', !isLoggedIn);
@@ -209,6 +212,7 @@ function resetDialogToCreateMode() {
 function openCreateDialog() {
   populateSelectOptions();
   taskForm.reset();
+  assigneeInput.value = assignees[0].id;
   commentInput.value = '';
   assigneeInput.value = users[0]?.id || '';
   resetDialogToCreateMode();
@@ -223,6 +227,12 @@ function openEditDialog(task) {
   statusField.classList.remove('hidden');
   createNote.classList.add('hidden');
 
+  document.getElementById('phaseInput').value = task.phase;
+  document.getElementById('taskInput').value = task.title;
+  document.getElementById('descriptionInput').value = task.description;
+  priorityInput.value = task.priority;
+  assigneeInput.value = task.assigneeId;
+  statusInput.value = task.status;
   phaseInput.value = task.phase;
   taskInput.value = task.title;
   descriptionInput.value = task.description;
@@ -234,6 +244,10 @@ function openEditDialog(task) {
   dialog.showModal();
 }
 
+function onDeleteTask(id) {
+  tasks = tasks.filter((task) => task.id !== id);
+  saveTasks(tasks);
+  renderBoard();
 function renderComments(task, commentList) {
   commentList.innerHTML = '';
   const comments = Array.isArray(task.comments) ? task.comments.slice(-3).reverse() : [];
@@ -267,10 +281,21 @@ function createTaskCard(task) {
   chip.dataset.priority = task.priority;
   chip.textContent = task.priority;
 
+  const avatar = node.querySelector('.avatar');
+  avatar.textContent = assignee.initials;
+  avatar.style.background = assignee.color;
+  node.querySelector('.assignee-name').textContent = assignee.name;
+
   node.querySelector('.edit').addEventListener('click', (event) => {
     event.stopPropagation();
     openEditDialog(task);
   });
+
+  node.querySelector('.delete').addEventListener('click', (event) => {
+    event.stopPropagation();
+    onDeleteTask(task.id);
+  });
+  node.querySelector('.delete').addEventListener('click', () => onDeleteTask(task.id));
 
   node.addEventListener('dragstart', (event) => {
     event.dataTransfer.setData('text/plain', task.id);
@@ -402,6 +427,11 @@ function attachEventListeners() {
     }
   });
 
+  document.getElementById('addTaskBtn').addEventListener('click', openCreateDialog);
+
+  document.getElementById('cancelDialog').addEventListener('click', () => {
+    dialog.close();
+    resetDialogToCreateMode();
   logoutBtn.addEventListener('click', () => {
     token = '';
     currentUser = null;
@@ -412,6 +442,7 @@ function attachEventListeners() {
     dialog.showModal();
   });
 
+  taskForm.addEventListener('submit', (event) => {
   phaseFilter.addEventListener('change', renderBoard);
   priorityFilter.addEventListener('change', renderBoard);
   searchInput.addEventListener('input', renderBoard);
@@ -455,18 +486,44 @@ function attachEventListeners() {
     const phase = document.getElementById('phaseInput').value.trim();
     const title = document.getElementById('taskInput').value.trim();
     const description = document.getElementById('descriptionInput').value.trim();
+    const priority = priorityInput.value;
     const priority = document.getElementById('priorityInput').value;
     const assigneeId = assigneeInput.value;
+    const editingTaskId = editingTaskIdInput.value;
 
     if (!phase || !title || !description) return;
 
+    if (editingTaskId) {
+      const task = tasks.find((item) => item.id === editingTaskId);
+      if (task) {
+        Object.assign(
+          task,
+          normalizeTask({
+            ...task,
+            phase,
+            title,
+            description,
+            status: statusInput.value,
+            priority,
+            assigneeId,
+          }),
+        );
+      }
+    } else {
+      tasks.unshift(
+        normalizeTask({ id: crypto.randomUUID(), phase, title, description, status: 'todo', priority, assigneeId }),
+      );
+      phaseFilter.value = 'all';
+      priorityFilter.value = 'all';
+      searchInput.value = '';
+    }
     tasks.unshift(
       normalizeTask({ id: crypto.randomUUID(), phase, title, description, status: 'todo', priority, assigneeId }),
       normalizeTask({ id: crypto.randomUUID(), phase, title, description, status, priority, assigneeId }),
     );
 
     saveTasks(tasks);
-    event.target.reset();
+    taskForm.reset();
     assigneeInput.value = assignees[0].id;
     phaseFilter.value = 'all';
     priorityFilter.value = 'all';
@@ -479,6 +536,10 @@ function attachEventListeners() {
 
   dialog.addEventListener('close', () => {
     resetDialogToCreateMode();
+  });
+
+  document.getElementById('resetBoard').addEventListener('click', () => {
+    tasks = [...initialTasks];
     taskForm.reset();
   });
 
